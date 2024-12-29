@@ -13,3 +13,6 @@
 
 ## 项目开发规范
 参见：https://blog.csdn.net/LegendaryChen/article/details/129142162
+
+## 相关链接
+Live2D SDK for Unity官方文档：https://docs.live2d.com/zh-CHS/cubism-sdk-tutorials/getting-started/
