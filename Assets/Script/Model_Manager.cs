@@ -4,40 +4,38 @@ using UnityEngine;
 using UnityEngine.UI;
 public class Model_Manager : MonoBehaviour
 {
-    // ÒıÓÃLive2DÄ£ĞÍ×é¼ş
+    // å¼•ç”¨Live2Dæ¨¡å‹ç»„ä»¶
     private CubismModel model;
     public Slider slider;
     public float testValue;
 
-    //¹Û¿´·½Ïò
-    [Header("¹Û¿´·½Ïò")]
+    //è§‚çœ‹æ–¹å‘
+    [Header("è§‚çœ‹æ–¹å‘")]
     public Vector2 look_pos;  
     private Vector2 curr_pos,target_pos;
     bool isLooking;
 
-    //Í·µÄ½Ç¶È
+    //å¤´çš„è§’åº¦
     public float head_angle;
-    //Õ£ÑÛ
-    [Header("Õ£ÑÛ")]
+    //çœ¨çœ¼
+    [Header("çœ¨çœ¼")]
     public float blink_OpenValue;
     float blink_timer;
     public float blink_Speed;
     bool isOpen_Eyes, isClose_Eyes;
 
-    //ºôÎü
-    [Header("ºôÎü")]
+    //å‘¼å¸
+    [Header("å‘¼å¸")]
     public float breathe_value;
     
-    //Ëµ»°
-    [Header("Ëµ»°")]
+    //è¯´è¯
+    [Header("è¯´è¯")]
     public float talk_value;
     float talk_timer;
     public float talk_Speed;
     bool isOpen_Talk, isClose_Talk;
     public bool isTalking;
-
-
-
+    
 
     private void Start()
     {
@@ -49,8 +47,7 @@ public class Model_Manager : MonoBehaviour
         blink_timer = Random.Range(1.0f,8.0f);
 
     }
-
-
+    
 
     IEnumerator breathe()
     {
@@ -67,6 +64,7 @@ public class Model_Manager : MonoBehaviour
         }
     }
 
+    
     private void Update()
     {
         UpdateValue();
@@ -76,80 +74,83 @@ public class Model_Manager : MonoBehaviour
         Talk();
 
     }
+    
+    
     private void UpdateValue()
     {
-        //½Ç¶ÈX
+        //è§’åº¦X
         model.Parameters[0].Value = look_pos.x;
-        //½Ç¶ÈY
+        //è§’åº¦Y
         model.Parameters[1].Value = look_pos.y;
-        //½Ç¶ÈZ
+        //è§’åº¦Z
         //model.Parameters[2].Value = head_angle;
 
-        //Á³¼Õ·ººì
+        //è„¸é¢Šæ³›çº¢
         //model.Parameters[3].Value = ;
-        //×óÑÛ¿ª±Õ
+        //å·¦çœ¼å¼€é—­
         model.Parameters[4].Value = blink_OpenValue;
-        //×óÑÛÎ¢Ğ¦
+        //å·¦çœ¼å¾®ç¬‘
         //model.Parameters[5].Value = ;
-        //ÓÒÑÛ¿ª±Õ
+        //å³çœ¼å¼€é—­
         model.Parameters[6].Value = blink_OpenValue;
-        //ÓÒÑÛÎ¢Ğ¦
+        //å³çœ¼å¾®ç¬‘
         //model.Parameters[7].Value = ;
 
-        //ÑÛÖéX
+        //çœ¼ç X
         model.Parameters[8].Value = look_pos.x/30;
-        //ÑÛÖéY
+        //çœ¼ç Y
         model.Parameters[9].Value = look_pos.y/30;
-        //×óÃ¼±äĞÎ
+        //å·¦çœ‰å˜å½¢
         //model.Parameters[10].Value = ;
-        //ÓÒÃ¼±äĞÎ
+        //å³çœ‰å˜å½¢
         //model.Parameters[11].Value = ;
-        //×ì±äĞÎ
+        //å˜´å˜å½¢
         //model.Parameters[12].Value = ;
-        //×ì¿ªºÏ
+        //å˜´å¼€åˆ
         model.Parameters[13].Value = talk_value;
-        //ÉíÌåĞı×ªX
+        //èº«ä½“æ—‹è½¬X
         model.Parameters[14].Value = look_pos.x/3;
-        //ÉíÌåĞı×ªY
+        //èº«ä½“æ—‹è½¬Y
         model.Parameters[15].Value = look_pos.y/3;
-        //ÉíÌåĞı×ªZ
+        //èº«ä½“æ—‹è½¬Z
         //model.Parameters[16].Value = ;
-        //ÉíÌåĞı×ªZ
+        //èº«ä½“æ—‹è½¬Z
         //model.Parameters[16].Value = ;
-        //ºôÎü
+        //å‘¼å¸
         model.Parameters[17].Value = breathe_value;
-        //×ó±Û A
+        //å·¦è‡‚ A
         model.Parameters[18].Value = breathe_value * 1.5f;
-        //ÓÒ±Û B
+        //å³è‡‚ B
         model.Parameters[19].Value = breathe_value * 1.5f;
 
-        //ĞØ²¿Ò¡¶¯
+        //èƒ¸éƒ¨æ‘‡åŠ¨
         //model.Parameters[20].Value = ;
-        //Í··¢Ò¡¶¯ Ç°
+        //å¤´å‘æ‘‡åŠ¨ å‰
         //model.Parameters[21].Value = ;
-        //Í··¢Ò¡¶¯ ²à
+        //å¤´å‘æ‘‡åŠ¨ ä¾§
         //model.Parameters[22].Value = ;
-        //Í··¢Ò¡¶¯ ºó
+        //å¤´å‘æ‘‡åŠ¨ å
         //model.Parameters[23].Value = ;
-        //±è×ÓµÄÒ¡¶¯
+        //è¾«å­çš„æ‘‡åŠ¨
         //model.Parameters[24].Value = ;
-        //ºûµû½áµÄÒ¡¶¯
+        //è´è¶ç»“çš„æ‘‡åŠ¨
         //model.Parameters[25].Value = ;
-        //¶ÌÈ¹µÄÒ¡¶¯
+        //çŸ­è£™çš„æ‘‡åŠ¨
         //model.Parameters[26].Value = ;
-        //·¢ÊÎµÄÒ¡¶¯
+        //å‘é¥°çš„æ‘‡åŠ¨
         //model.Parameters[27].Value = ;
         model.ForceUpdateNow();
     }
 
-    //Õ£ÑÛ·½·¨
+    
+    //çœ¨çœ¼æ–¹æ³•
     private void Blink()
     {
         if (blink_timer <= 0)
         {
             if (isClose_Eyes && !isOpen_Eyes)
             {
-                //ÕöÑÛ
+                //ççœ¼
                 blink_OpenValue += Time.deltaTime * blink_Speed;
                 if (blink_OpenValue >= 1.2f) { isOpen_Eyes = true; }
             }
@@ -161,7 +162,7 @@ public class Model_Manager : MonoBehaviour
             }
             else
             {
-                //±ÕÑÛ
+                //é—­çœ¼
                 blink_OpenValue -= Time.deltaTime * blink_Speed;
                 if (blink_OpenValue <= 0) { isClose_Eyes = true; }
             }
@@ -171,14 +172,16 @@ public class Model_Manager : MonoBehaviour
             blink_timer -= Time.deltaTime;
         }
     }
-    //Ëµ»°·½·¨
+    
+    
+    //è¯´è¯æ–¹æ³•
     private void Talk()
     {
         if (isTalking)
         {
             if (isClose_Talk && !isOpen_Talk)
             {
-                //¿ª
+                //å¼€
                 talk_value += Time.deltaTime*talk_Speed;
                 if (talk_value >= 1f) { isOpen_Talk = true; }
             }
@@ -190,7 +193,7 @@ public class Model_Manager : MonoBehaviour
             }
             else
             {
-                //±Õ
+                //é—­
                 talk_value -= Time.deltaTime * talk_Speed;
                 if (talk_value <= 0) { isClose_Talk = true; }
             }
@@ -202,6 +205,7 @@ public class Model_Manager : MonoBehaviour
         }
     }
 
+    
     IEnumerator Random_Pos()
     {
         float timer=0;
@@ -230,6 +234,8 @@ public class Model_Manager : MonoBehaviour
             yield return new WaitForSeconds(0.01f);
         }
     }
+    
+    
     public void BindingValue()
     {
         testValue = slider.value;
