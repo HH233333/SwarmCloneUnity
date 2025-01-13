@@ -2,8 +2,6 @@ using Live2D.Cubism.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using static UnityEditor.Progress;
 public class Model_Manager : MonoBehaviour
 {
     // 引用Live2D模型组件
@@ -22,10 +20,10 @@ public class Model_Manager : MonoBehaviour
 
     //说话
     [Header("说话")]
-    public ActionAnimation action_talk;
+    public Action_Resources action_talk;
     public bool is_talking;
 
-    public ActionAnimation[] actions;
+    public Action_Resources[] actions;
     // 字典用于存储协程的唯一标识符和协程引用
     public Dictionary<string, AnimationValues> coroutineDictionary = new Dictionary<string, AnimationValues>();
     [Header("用于动态修改各个动作属性")]
@@ -62,12 +60,12 @@ public class Model_Manager : MonoBehaviour
     }
     private void Init()
     {
-        actions = Resources.LoadAll<ActionAnimation>("Actions");
+        actions = Resources.LoadAll<Action_Resources>("Actions");
         InitActions(actions);
         //Breathe();
         //Blink();
     }
-    private void InitActions(ActionAnimation[] actions)
+    private void InitActions(Action_Resources[] actions)
     {
         foreach (var item in actions)
         {
