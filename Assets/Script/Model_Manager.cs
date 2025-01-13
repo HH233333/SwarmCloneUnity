@@ -1,237 +1,186 @@
 using Live2D.Cubism.Core;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 public class Model_Manager : MonoBehaviour
 {
     // 引用Live2D模型组件
     private CubismModel model;
-    public Slider slider;
     public float testValue;
 
+
+    [Header("用于初始化的属性")]
     //观看方向
     [Header("观看方向")]
-    public Vector2 look_pos;  
-    private Vector2 curr_pos,target_pos;
+    public Vector2 look_pos;
+    private Vector2 curr_pos, target_pos;
     bool isLooking;
 
-    //头的角度
-    public float head_angle;
-    //眨眼
-    [Header("眨眼")]
-    public float blink_OpenValue;
-    float blink_timer;
-    public float blink_Speed;
-    bool isOpen_Eyes, isClose_Eyes;
 
-    //呼吸
-    [Header("呼吸")]
-    public float breathe_value;
-    
+
     //说话
     [Header("说话")]
-    public float talk_value;
-    float talk_timer;
-    public float talk_Speed;
-    bool isOpen_Talk, isClose_Talk;
-    public bool isTalking;
+    public ActionAnimation action_talk;
+    public bool is_talking;
 
+    public ActionAnimation[] actions;
+    // 字典用于存储协程的唯一标识符和协程引用
+    public Dictionary<string, AnimationValues> coroutineDictionary = new Dictionary<string, AnimationValues>();
+    [Header("用于动态修改各个动作属性")]
+    public List<AnimationValues> corou_List;
 
+    public List<string> test;
 
-
+    public bool Is_talking
+    {
+        get => is_talking;
+        set
+        {
+            is_talking = value;
+            if (is_talking)
+            {
+                coroutineDictionary[action_talk.action_name].isPlaying = true;
+            }
+            else
+            {
+                coroutineDictionary[action_talk.action_name].isPlaying = false;
+                StartCoroutine(ResetCoroutine(action_talk.action_name));
+            }
+        }
+    }
     private void Start()
     {
         model = GameObject.FindGameObjectWithTag("Live2D_Model").GetComponent<CubismModel>();
 
-        StartCoroutine(breathe());
-        StartCoroutine(Random_Pos());
-        blink_OpenValue = Random.Range(0.6f,1.2f);
-        blink_timer = Random.Range(1.0f,8.0f);
-
-    }
-
-
-
-    IEnumerator breathe()
-    {
-        float interval = 1.0f / 100.0f;
-        while (true)
+        Init();
+        foreach (var item in model.Parameters)
         {
-            breathe_value += interval;
-            if (breathe_value >= 1 || breathe_value<=0)
+            test.Add(item.name);
+        }
+    }
+    private void Init()
+    {
+        actions = Resources.LoadAll<ActionAnimation>("Actions");
+        InitActions(actions);
+        //Breathe();
+        //Blink();
+    }
+    private void InitActions(ActionAnimation[] actions)
+    {
+        foreach (var item in actions)
+        {
+            if (item.actionIndies.Count < 1)
             {
-                interval *= -1;
-
+                continue;
             }
-            yield return new WaitForSeconds(0.03f);
+            if (item.action_name == "说话")
+            {
+                action_talk = item;
+            }
+            StartCoroutine_Animation(item.actionIndies, item.action_name, item.action_speed, item.action_wait, item.action_direction, item.isPlaying);
         }
     }
 
-    private void Update()
+
+    private void StartCoroutine_Animation(List<int> valueIndex, string id_name, float changeSpeed, float wait_time, int dirction, bool isPlaying)
     {
-        UpdateValue();
-        
-
-        Blink();
-        Talk();
-
-    }
-    private void UpdateValue()
-    {
-        //角度X
-        model.Parameters[0].Value = look_pos.x;
-        //角度Y
-        model.Parameters[1].Value = look_pos.y;
-        //角度Z
-        //model.Parameters[2].Value = head_angle;
-
-        //脸颊泛红
-        //model.Parameters[3].Value = ;
-        //左眼开闭
-        model.Parameters[4].Value = blink_OpenValue;
-        //左眼微笑
-        //model.Parameters[5].Value = ;
-        //右眼开闭
-        model.Parameters[6].Value = blink_OpenValue;
-        //右眼微笑
-        //model.Parameters[7].Value = ;
-
-        //眼珠X
-        model.Parameters[8].Value = look_pos.x/30;
-        //眼珠Y
-        model.Parameters[9].Value = look_pos.y/30;
-        //左眉变形
-        //model.Parameters[10].Value = ;
-        //右眉变形
-        //model.Parameters[11].Value = ;
-        //嘴变形
-        //model.Parameters[12].Value = ;
-        //嘴开合
-        model.Parameters[13].Value = talk_value;
-        //身体旋转X
-        model.Parameters[14].Value = look_pos.x/3;
-        //身体旋转Y
-        model.Parameters[15].Value = look_pos.y/3;
-        //身体旋转Z
-        //model.Parameters[16].Value = ;
-        //身体旋转Z
-        //model.Parameters[16].Value = ;
-        //呼吸
-        model.Parameters[17].Value = breathe_value;
-        //左臂 A
-        model.Parameters[18].Value = breathe_value * 1.5f;
-        //右臂 B
-        model.Parameters[19].Value = breathe_value * 1.5f;
-
-        //胸部摇动
-        //model.Parameters[20].Value = ;
-        //头发摇动 前
-        //model.Parameters[21].Value = ;
-        //头发摇动 侧
-        //model.Parameters[22].Value = ;
-        //头发摇动 后
-        //model.Parameters[23].Value = ;
-        //辫子的摇动
-        //model.Parameters[24].Value = ;
-        //蝴蝶结的摇动
-        //model.Parameters[25].Value = ;
-        //短裙的摇动
-        //model.Parameters[26].Value = ;
-        //发饰的摇动
-        //model.Parameters[27].Value = ;
-        model.ForceUpdateNow();
-    }
-
-    //眨眼方法
-    private void Blink()
-    {
-        if (blink_timer <= 0)
+        AnimationValues Values;
+        if (!coroutineDictionary.TryGetValue(id_name, out Values))
         {
-            if (isClose_Eyes && !isOpen_Eyes)
+            //开启协程传入ID，利用ID绑定相应的 AnimationValues;
+            Coroutine coroutine = StartCoroutine(Fixed_Up_Down(id_name, isPlaying, dirction));
+            Values = new AnimationValues(coroutine, valueIndex, id_name, changeSpeed, wait_time, isPlaying);
+            coroutineDictionary[id_name] = Values;
+            corou_List.Add(Values);
+        }
+    }
+
+    IEnumerator ResetCoroutine(string id_name)
+    {
+        AnimationValues values = coroutineDictionary[id_name];
+        List<int> curr_indices = values.Action_indices;
+        float curr_value = model.Parameters[curr_indices[0]].Value;
+        float min_value = model.Parameters[curr_indices[0]].MinimumValue;
+        while (curr_value > min_value)
+        {
+            curr_value -= 0.025f * values.changeSpeed;
+            UpdateAnimationValues(values.Action_indices, curr_value);
+            yield return new WaitForSeconds(0.05f);
+        }
+        UpdateAnimationValues(curr_indices, min_value);
+        yield break;
+    }
+
+
+
+
+    //简单固定地升降
+    IEnumerator Fixed_Up_Down(string id_name, bool isPlaying, int direction)
+    {
+        AnimationValues values;
+        while (!(coroutineDictionary.TryGetValue(id_name, out values) && coroutineDictionary[id_name] != null))
+        {
+            yield return new WaitForSeconds(0.005f);
+        }
+        List<int> valueIndex = values.Action_indices;
+
+        int curr_direction = direction;
+        float curr_Value = model.Parameters[valueIndex[0]].Value;
+        float max_Value = model.Parameters[valueIndex[0]].MaximumValue;
+        float min_Value = model.Parameters[valueIndex[0]].MinimumValue;
+
+        float waitTime, changeSpeed;
+
+        int count = 0;
+        while (true)
+        {
+            UpdateValues(id_name, out waitTime, out changeSpeed,out isPlaying);
+            if (!isPlaying)
             {
-                //睁眼
-                blink_OpenValue += Time.deltaTime * blink_Speed;
-                if (blink_OpenValue >= 1.2f) { isOpen_Eyes = true; }
+                yield return new WaitForSeconds(0.05f);
+                continue;
             }
-            else if (isOpen_Eyes)
+            
+            if (count >= 2)
             {
-                isClose_Eyes = false;
-                isOpen_Eyes = false;
-                blink_timer = Random.Range(1.0f, 8.0f);
+                yield return new WaitForSeconds(waitTime);
+                count = 0;
             }
-            else
+
+            curr_Value = Mathf.Clamp(curr_Value + 0.01f * changeSpeed * curr_direction, min_Value, max_Value);
+            if (curr_Value >= max_Value || curr_Value <= min_Value)
             {
-                //闭眼
-                blink_OpenValue -= Time.deltaTime * blink_Speed;
-                if (blink_OpenValue <= 0) { isClose_Eyes = true; }
+                curr_direction *= -1;
+                if (waitTime > 0) count++;
+
             }
+
+            UpdateAnimationValues(valueIndex, curr_Value);
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+    private void UpdateAnimationValues(List<int> valueIndex, float value)
+    {
+        //设置数值
+        if (valueIndex.Count == 1)
+        {
+            model.Parameters[valueIndex[0]].Value = value;
         }
         else
         {
-            blink_timer -= Time.deltaTime;
+            foreach (var item in valueIndex)
+            {
+                model.Parameters[item].Value = value;
+            }
         }
     }
-    //说话方法
-    private void Talk()
+    private void UpdateValues(string id_name, out float curr_waitTime, out float changeSpeed,out bool isPlaying)
     {
-        if (isTalking)
-        {
-            if (isClose_Talk && !isOpen_Talk)
-            {
-                //开
-                talk_value += Time.deltaTime*talk_Speed;
-                if (talk_value >= 1f) { isOpen_Talk = true; }
-            }
-            else if (isOpen_Talk)
-            {
-                isClose_Talk = false;
-                isOpen_Talk = false;
-                talk_timer = 1;
-            }
-            else
-            {
-                //闭
-                talk_value -= Time.deltaTime * talk_Speed;
-                if (talk_value <= 0) { isClose_Talk = true; }
-            }
-        }
-        else
-        {
-            if (talk_value <= 0) { return; }
-            talk_value -= Time.deltaTime * talk_Speed;
-        }
-    }
-
-    IEnumerator Random_Pos()
-    {
-        float timer=0;
-        float lerp_Value = 0f;
-        curr_pos = look_pos;
-        target_pos = new Vector2(Random.Range(-30, 31), Random.Range(-30, 31));
-        while (true)
-        {
-            if (timer < 3)
-            {
-                timer += Time.deltaTime;
-            }
-            else
-            {
-                lerp_Value += Time.deltaTime * testValue;
-                look_pos = Vector2.Lerp(curr_pos, target_pos, lerp_Value);
-                if (lerp_Value >= 1)
-                {
-                    lerp_Value = 0;
-                    timer = 0;
-                    curr_pos = look_pos;
-                    target_pos = new Vector2(Random.Range(-30, 31), Random.Range(-30, 31));
-                }
-            }
-
-            yield return new WaitForSeconds(0.01f);
-        }
-    }
-    public void BindingValue()
-    {
-        testValue = slider.value;
+        AnimationValues values = coroutineDictionary[id_name];
+        curr_waitTime = values.waitTime;
+        changeSpeed = values.changeSpeed;
+        isPlaying = values.isPlaying;
     }
 }
