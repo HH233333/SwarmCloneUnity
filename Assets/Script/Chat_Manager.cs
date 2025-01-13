@@ -27,14 +27,13 @@ public class Chat_Manager : MonoBehaviour
         foreach (var item in text)
         {
             chat_text.text += item;
-            print(item);
 
-            model_Manager.isTalking = true;          
+            model_Manager.Is_talking = true;          
 
             yield return new WaitForSeconds(text_wait_time);
         }
-        model_Manager.isTalking = false;
-        StopAllCoroutines();
+        model_Manager.Is_talking = false;
+        yield break;
     }
 
 
