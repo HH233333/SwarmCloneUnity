@@ -4,29 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 public class Model_Manager : MonoBehaviour
 {
-    // ÒıÓÃLive2DÄ£ĞÍ×é¼ş
+    // å¼•ç”¨Live2Dæ¨¡å‹ç»„ä»¶
     private CubismModel model;
     public float testValue;
 
 
-    [Header("ÓÃÓÚ³õÊ¼»¯µÄÊôĞÔ")]
-    //¹Û¿´·½Ïò
-    [Header("¹Û¿´·½Ïò")]
+    [Header("ç”¨äºåˆå§‹åŒ–çš„å±æ€§")]
+    //è§‚çœ‹æ–¹å‘
+    [Header("è§‚çœ‹æ–¹å‘")]
     public Vector2 look_pos;
     private Vector2 curr_pos, target_pos;
     bool isLooking;
 
 
 
-    //Ëµ»°
-    [Header("Ëµ»°")]
+    //è¯´è¯
+    [Header("è¯´è¯")]
     public Action_Resources action_talk;
     public bool is_talking;
 
     public Action_Resources[] actions;
-    // ×ÖµäÓÃÓÚ´æ´¢Ğ­³ÌµÄÎ¨Ò»±êÊ¶·ûºÍĞ­³ÌÒıÓÃ
+    // å­—å…¸ç”¨äºå­˜å‚¨åç¨‹çš„å”¯ä¸€æ ‡è¯†ç¬¦å’Œåç¨‹å¼•ç”¨
     public Dictionary<string, AnimationValues> coroutineDictionary = new Dictionary<string, AnimationValues>();
-    [Header("ÓÃÓÚ¶¯Ì¬ĞŞ¸Ä¸÷¸ö¶¯×÷ÊôĞÔ")]
+    [Header("ç”¨äºåŠ¨æ€ä¿®æ”¹å„ä¸ªåŠ¨ä½œå±æ€§")]
     public List<AnimationValues> corou_List;
 
     public List<string> test;
@@ -73,7 +73,7 @@ public class Model_Manager : MonoBehaviour
             {
                 continue;
             }
-            if (item.action_name == "Ëµ»°")
+            if (item.action_name == "è¯´è¯")
             {
                 action_talk = item;
             }
@@ -87,7 +87,7 @@ public class Model_Manager : MonoBehaviour
         AnimationValues Values;
         if (!coroutineDictionary.TryGetValue(id_name, out Values))
         {
-            //¿ªÆôĞ­³Ì´«ÈëID£¬ÀûÓÃID°ó¶¨ÏàÓ¦µÄ AnimationValues;
+            //å¼€å¯åç¨‹ä¼ å…¥IDï¼Œåˆ©ç”¨IDç»‘å®šç›¸åº”çš„ AnimationValues;
             Coroutine coroutine = StartCoroutine(Fixed_Up_Down(id_name, isPlaying, dirction));
             Values = new AnimationValues(coroutine, valueIndex, id_name, changeSpeed, wait_time, isPlaying);
             coroutineDictionary[id_name] = Values;
@@ -114,7 +114,7 @@ public class Model_Manager : MonoBehaviour
 
 
 
-    //¼òµ¥¹Ì¶¨µØÉı½µ
+    //ç®€å•å›ºå®šåœ°å‡é™
     IEnumerator Fixed_Up_Down(string id_name, bool isPlaying, int direction)
     {
         AnimationValues values;
@@ -161,7 +161,7 @@ public class Model_Manager : MonoBehaviour
     }
     private void UpdateAnimationValues(List<int> valueIndex, float value)
     {
-        //ÉèÖÃÊıÖµ
+        //è®¾ç½®æ•°å€¼
         if (valueIndex.Count == 1)
         {
             model.Parameters[valueIndex[0]].Value = value;

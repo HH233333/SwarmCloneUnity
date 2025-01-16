@@ -16,7 +16,7 @@ public class Chat_Manager : MonoBehaviour
     public void UpdateInputField_Enter()
     {
         SetSomeText(chat_input.text);
-        print("ÎÄ±¾ÊäÈë");
+        print("ÃÃ„Â±Â¾ÃŠÃ¤ÃˆÃ«");
     }
     public void SetSomeText(string text)
     {
@@ -35,6 +35,4 @@ public class Chat_Manager : MonoBehaviour
         model_Manager.Is_talking = false;
         yield break;
     }
-
-
 }
