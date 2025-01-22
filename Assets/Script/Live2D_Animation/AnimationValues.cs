@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +10,7 @@ public class AnimationValues
     public Coroutine coroutine;
     [DisplayOnly]
     public List<int> Action_indices;
-    [Header("Ãû³Æ")]
+    [Header("åç§°")]
     [DisplayOnly]
     public string name;
 

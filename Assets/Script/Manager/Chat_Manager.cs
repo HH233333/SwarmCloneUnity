@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,7 +16,7 @@ public class Chat_Manager : MonoBehaviour
     public void UpdateInputField_Enter()
     {
         SetSomeText(chat_input.text);
-        print("ÎÄ±¾ÊäÈë");
+        print("文本输入");
     }
     public void SetSomeText(string text)
     {
@@ -35,4 +35,6 @@ public class Chat_Manager : MonoBehaviour
         model_Manager.Is_talking = false;
         yield break;
     }
+
+
 }

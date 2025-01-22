@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,17 +6,17 @@ using UnityEngine;
 [CreateAssetMenu]
 public class Action_Resources : ScriptableObject
 {
-    [Header("¸Ã¶¯×÷Ãû³Æ")]
+    [Header("è¯¥åŠ¨ä½œåç§°")]
     public string action_name;
-    [Header("Ïà¹Ø¶¯×÷µÄlive2DË÷Òı")]
+    [Header("ç›¸å…³åŠ¨ä½œçš„live2Dç´¢å¼•")]
     public List<int> actionIndies;
-    [Header("¶¯×÷²¥·ÅËÙ¶È")]
+    [Header("åŠ¨ä½œæ’­æ”¾é€Ÿåº¦")]
     public float action_speed = 10;
-    [Header("¶¯×÷²¥·Å¼ä¸ô")]
+    [Header("åŠ¨ä½œæ’­æ”¾é—´éš”")]
     public float action_wait = 0;
-    [Header("¶¯×÷³õÊ¼±ä»¯·½Ïò")]
+    [Header("åŠ¨ä½œåˆå§‹å˜åŒ–æ–¹å‘")]
     public int action_direction = 1;
-    [Header("¶¯×÷ÊÇ·ñ¿ªÊ¼²¥·Å")]
+    [Header("åŠ¨ä½œæ˜¯å¦å¼€å§‹æ’­æ”¾")]
     public bool isPlaying = true;
 
 }

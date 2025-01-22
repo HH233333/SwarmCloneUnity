@@ -1,4 +1,4 @@
-using Live2D.Cubism.Core;
+﻿using Live2D.Cubism.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +6,7 @@ public class Model_Manager : MonoBehaviour
 {
     // 引用Live2D模型组件
     private CubismModel model;
-    public float testValue;
 
-
-    [Header("用于初始化的属性")]
     //观看方向
     [Header("观看方向")]
     public Vector2 look_pos;
@@ -62,8 +59,6 @@ public class Model_Manager : MonoBehaviour
     {
         actions = Resources.LoadAll<Action_Resources>("Actions");
         InitActions(actions);
-        //Breathe();
-        //Blink();
     }
     private void InitActions(Action_Resources[] actions)
     {
@@ -87,7 +82,7 @@ public class Model_Manager : MonoBehaviour
         AnimationValues Values;
         if (!coroutineDictionary.TryGetValue(id_name, out Values))
         {
-            //开启协程传入ID，利用ID绑定相应的 AnimationValues;
+            //开启协程传入ID，ID绑定相应的 AnimationValues;
             Coroutine coroutine = StartCoroutine(Fixed_Up_Down(id_name, isPlaying, dirction));
             Values = new AnimationValues(coroutine, valueIndex, id_name, changeSpeed, wait_time, isPlaying);
             coroutineDictionary[id_name] = Values;
@@ -114,7 +109,7 @@ public class Model_Manager : MonoBehaviour
 
 
 
-    //简单固定地升降
+    //固定地升降
     IEnumerator Fixed_Up_Down(string id_name, bool isPlaying, int direction)
     {
         AnimationValues values;
