@@ -9,12 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 66baaf0a1a353bf4199c31459567cfd9, type: 3}
-  m_Name: "\u7728\u773C"
+  m_Script: {fileID: 11500000, guid: 710c74d81289fea4784df0c564d5b9e8, type: 3}
+  m_Name: X
   m_EditorClassIdentifier: 
-  action_name: "\u7728\u773C"
-  actionIndies: 04000000050000000600000007000000
-  action_speed: 50
-  action_wait: 3
-  action_direction: -1
+  action_name: X
+  actionIndies: 000000000e000000
+  action_speed: 0.03
+  waitTime: 0
+  waitTime_min: 0
+  waitTime_max: 3
   isPlaying: 1
