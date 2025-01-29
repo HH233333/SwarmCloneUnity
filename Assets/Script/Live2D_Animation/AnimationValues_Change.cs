@@ -1,21 +1,44 @@
-﻿using System;
+﻿using Live2D.Cubism.Core;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 public class AnimationValues_Change : AnimationValues
-
 {
+    float target_value;
 
-    public Vector3 min_vertor3;
-    public Vector3 max_vertor3;
-
-    public AnimationValues_Change(Coroutine coroutine, List<int> action_indices, string name, float changeSpeed, float waitTime, float waitTime_min, float waitTime_max, bool isPlaying, Vector3 min_vertor3, Vector3 max_vertor3)
+    public AnimationValues_Change(List<int> action_indices, string name, float changeSpeed, float waitTime, float waitTime_min, float waitTime_max, bool isPlaying, CubismModel model)
     {
-        base.InitValues(coroutine, action_indices, name, changeSpeed, waitTime, waitTime_min, waitTime_max, isPlaying);
+        InitValues(action_indices, name, changeSpeed, waitTime, waitTime_min, waitTime_max, isPlaying, model);
+        target_value = UnityEngine.Random.Range(min_value, max_value);
+    }
 
-        this.min_vertor3 = min_vertor3;
-        this.max_vertor3 = max_vertor3;
+    public override void StartAction()
+    {
+        if (isPlaying)
+        {
+            if (timer > 0)
+            {
+                Timer();
+                return;
+            }
+            curr_value = Mathf.Lerp(curr_value, target_value, changeSpeed);
+            if (Mathf.Abs(curr_value - target_value) < 0.02f)
+            {
+                target_value = UnityEngine.Random.Range(min_value, max_value);
+                Update_waitTime();
+            }
+            Update_ModelValues();
+        }
+    }
+
+    protected override void Update_ModelValues()
+    {
+
+        model.Parameters[action_indices[0]].Value = curr_value;
+        model.Parameters[action_indices[1]].Value = curr_value/3;
+
     }
 }
