@@ -14,9 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   action_name: "\u8BF4\u8BDD"
   actionIndies: 0d000000
-  action_speed: 60
+  action_speed: 10
   waitTime: 0.1
   waitTime_min: 0
   waitTime_max: 0.05
   isPlaying: 0
+  waitTime2: 0
   action_direction: 1
