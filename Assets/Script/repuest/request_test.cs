@@ -5,11 +5,18 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
+using UnityEngine.UI;
+using TMPro;
+using Unity.VisualScripting;
+using System;
 
 
 public class request_test : MonoBehaviour
-{
+{   
+    private string[] arg = Environment.GetCommandLineArgs();
     private TcpClient client;
+    public TMP_Text chat_text;
     private NetworkStream stream;
     public request_queue request_Queue;
     public string serverIP = "localhost";  // 服务端 IP 地址
@@ -24,7 +31,17 @@ public class request_test : MonoBehaviour
 
     void Start()
     {
+        #if !UNITY_EDITOR
+        if(arg[2]!=null)
+        {
+            serverIP = arg[2];
+            serverPort = int.Parse(arg[3]);
+        }
+        #endif
+        Debug.Log(serverIP);
+        Debug.Log(serverPort);
         ConnectToServer();
+        
     }
     // Update is called once per frame
     void ConnectToServer()
@@ -110,7 +127,6 @@ public class request_test : MonoBehaviour
                 {
                     request_Queue.ShareData=data;
                 }
-                Debug.Log("request_test队列:  "+request_Queue.isempty());
             }
             yield return null;
         }

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using TMPro;
@@ -8,7 +7,7 @@ using UnityEngine;
 public class Chat_Manager : MonoBehaviour
 {
     public TMP_Text chat_text;
-    public float text_wait_time=0.1f;
+
     public class idinform
     {
         public List<string> Text = new List<string>();
@@ -17,9 +16,9 @@ public class Chat_Manager : MonoBehaviour
     }
     public Dictionary<string, idinform> IDdict = new Dictionary<string,idinform>();
     public ConcurrentQueue<string>IDlist = new ConcurrentQueue<string>();
-    public Model_Manager model_Manager;
     public request_queue request_Queue;
     public float enter_timer;
+ 
     private void Start()
     {
         StartCoroutine(GetMSG());
@@ -38,42 +37,29 @@ public class Chat_Manager : MonoBehaviour
         }
     }
 
-    public void SetSomeText()
-    {
-        List<string> ids = new List<string>();
-        chat_text.text = "";
+    IEnumerator Model_talking(ConcurrentQueue<string> IDlist)
+    {   
+        motioncontroller.instance.Is_Talking = true;
         while(!IDlist.IsEmpty)
         {
             string id;
             IDlist.TryDequeue(out id);
-            ids.Add(id);
-        }
-        print("文本输入");
-        StartCoroutine(Model_talking(ids));
-  
-     
-    }
-    IEnumerator Model_talking(List<string> ids)
-    {
-        foreach(var id in ids)
-        {
-            for(int i=0;i<IDdict[id].Text.Count;i++)
+            motioncontroller.instance.Motion=IDdict[id].emotion;
+            for(int j=0;j<IDdict[id].Text.Count;j++)
             {
-                chat_text.text += IDdict[id].Text[i];
-                model_Manager.Is_talking = true;
-                motioncont_test.instance.Motion=IDdict[id].emotion;
-
+                chat_text.text += IDdict[id].Text[j];
                 enter_timer = 5;
-                yield return new WaitForSeconds(IDdict[id].Voice[i]);
+                yield return new WaitForSeconds(IDdict[id].Voice[j]);
             }
             IDdict.Remove(id);
         }
-        model_Manager.Is_talking = false;
+        Debug.Log(IDdict.Count);
+        motioncontroller.instance.Is_Talking = false;
         yield break;
     }
+
     IEnumerator GetMSG()
     {   
-        
         while(true)
         {   
             if(!request_Queue.isempty())
@@ -83,16 +69,19 @@ public class Chat_Manager : MonoBehaviour
                 {
                     IDlist.Enqueue(msg.payload["id"].ToString());
                     IDdict.Add(msg.payload["id"].ToString(),new idinform());
+                    Debug.Log(IDdict.Count);
                     IDdict[msg.payload["id"].ToString()].emotion = getemotion((Dictionary<string, float>)msg.payload["emotion"]);
                 }
                 else if(msg.from == "tts" && msg.type == "data")
                 {
                     IDdict[msg.payload["id"].ToString()].Text.Add(msg.payload["token"].ToString());
-                    IDdict[msg.payload["id"].ToString()].Voice.Add((float)msg.payload["duration"]);
+                    IDdict[msg.payload["id"].ToString()].Voice.Add((float)msg.payload["duration"]);    
                 }
-                else if(msg.from == "tts" && msg.type == "signal" && msg.payload2 == "finish")
-                {   
-                    SetSomeText();
+                else if(msg.from == "tts" && msg.type == "signal" && msg.payload2== "finish")
+                {
+                    Debug.Log("开始输出");
+                    StartCoroutine(Model_talking(IDlist));
+
                 }
             }
             yield return new WaitForSeconds(0.001f);
