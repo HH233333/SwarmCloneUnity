@@ -5,10 +5,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
-using UnityEngine.UI;
-using TMPro;
-using Unity.VisualScripting;
+using System.Threading;
 using System;
 
 
@@ -16,13 +13,12 @@ public class request_test : MonoBehaviour
 {   
     private string[] arg = Environment.GetCommandLineArgs();
     private TcpClient client;
-    public TMP_Text chat_text;
     private NetworkStream stream;
     public request_queue request_Queue;
     public string serverIP = "localhost";  // 服务端 IP 地址
     public int serverPort = 8006;
 
-    SendData modelreay = new SendData
+    SendData modelready = new SendData
         {
             from = "frontend",
             type = "signal",
@@ -31,28 +27,54 @@ public class request_test : MonoBehaviour
 
     void Start()
     {
-        #if !UNITY_EDITOR
-        if(arg[2]!=null)
+        try
         {
-            serverIP = arg[2];
-            serverPort = int.Parse(arg[3]);
+            #if !UNITY_EDITOR
+            if(arg[2]!=null)
+            {
+                serverIP = arg[2];
+                serverPort = int.Parse(arg[3]);
+            }
+            #endif
         }
-        #endif
-        Debug.Log(serverIP);
-        Debug.Log(serverPort);
-        ConnectToServer();
-        
+        catch(Exception ex)
+        {
+            Debug.LogWarning(ex+"ip输入失败，使用默认ip");
+        }
+        finally
+        {            
+            Debug.Log(serverIP);
+            Debug.Log(serverPort);
+            StartCoroutine(ConnectToServer());
+        }
     }
-    // Update is called once per frame
-    void ConnectToServer()
-    {
-        client = new TcpClient(serverIP, serverPort);
+    IEnumerator ConnectToServer()
+    { 
+        while(true)
+        {
+            var success = false;
+            try
+            {   
+                client = new TcpClient(serverIP, serverPort);
+                success = true;   
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("连接失败：" + ex.Message);
+            }
+
+            yield return new WaitForSeconds(5);
+            Debug.Log("等待链接");
+            if(success)
+                break;
+        }
+
         stream = client.GetStream();
         Debug.Log("成功连接到服务器");
-        string jsonString = JsonConvert.SerializeObject(modelreay);
+        string jsonString = JsonConvert.SerializeObject(modelready);
         SendMessages(jsonString);
         StartCoroutine(ReceiveData());
-
+        yield break;
     }
     void SendMessages(string message)
     {
