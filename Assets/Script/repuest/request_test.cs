@@ -5,9 +5,11 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Threading;
 using System;
-
+using Tomlyn;
+using Tomlyn.Model;
+using System.IO;
+using UnityEngine.UIElements;
 
 public class request_test : MonoBehaviour
 {   
@@ -17,7 +19,7 @@ public class request_test : MonoBehaviour
     public request_queue request_Queue;
     public string serverIP = "localhost";  // 服务端 IP 地址
     public int serverPort = 8006;
-
+    private string configPath = "config.json";
     SendData modelready = new SendData
         {
             from = "frontend",
@@ -26,27 +28,37 @@ public class request_test : MonoBehaviour
         };
 
     void Start()
-    {
-        try
-        {
-            #if !UNITY_EDITOR
-            if(arg[2]!=null)
+    {       
+            var rootpath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
+            List<string> configPaths = new List<string>
             {
-                serverIP = arg[2];
-                serverPort = int.Parse(arg[3]);
+                Path.Combine(Directory.GetCurrentDirectory(), "server_settings.toml"),
+                Path.Combine(Directory.GetParent(rootpath).FullName,"config/server_settings.toml"),
+            };
+            string configPath;
+            foreach(var path in configPaths)
+            {
+                if (File.Exists(path))
+                {
+                    configPath = path;
+                    string tomlContent = File.ReadAllText(configPath);
+                    try
+                    {
+                        var setting = Toml.ToModel(tomlContent);
+                        serverIP = ((TomlTable)(((TomlTable)setting["panel"])["server"]))["host"].ToString();
+                        serverPort = Convert.ToInt32(((TomlTable)setting["unity_frontend"])["port"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("解析 TOML 文件失败: " + ex.Message);
+                    }
+                }
+                else
+                    Debug.LogWarning("配置文件不存在: " + path);
             }
-            #endif
-        }
-        catch(Exception ex)
-        {
-            Debug.LogWarning(ex+"ip输入失败，使用默认ip");
-        }
-        finally
-        {            
             Debug.Log(serverIP);
             Debug.Log(serverPort);
             StartCoroutine(ConnectToServer());
-        }
     }
     IEnumerator ConnectToServer()
     { 
