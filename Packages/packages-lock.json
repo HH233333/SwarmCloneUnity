@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.dave30406.tomlynunity": {
+      "version": "https://github.com/dave30406/Tomlyn-Unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "272c857a5fa3b8bb11a03fb23438fe85e8da5890"
+    },
     "com.unity.2d.animation": {
       "version": "9.1.3",
       "depth": 1,
