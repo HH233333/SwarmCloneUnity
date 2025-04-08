@@ -127,6 +127,8 @@ public class request_test : MonoBehaviour
                                         recvdata.payload.Add(property2.Name, (float)property2.Value);
                                     else if(property2.Value.Type == JTokenType.String)
                                         recvdata.payload.Add(property2.Name, property2.Value.ToString());
+                                    else if(property2.Value.Type == JTokenType.Bytes)
+                                        recvdata.payload.Add(property2.Name, property2.Value);
                                     else
                                     {
                                         Dictionary<string,float> emotion = new Dictionary<string,float>();
