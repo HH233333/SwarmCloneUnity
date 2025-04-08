@@ -67,7 +67,6 @@ public class Chat_Manager : MonoBehaviour
                 RecvData msg = request_Queue.ShareData;
                 if(msg.from == "llm" && msg.type == "data")
                 {
-                    IDlist.Enqueue(msg.payload["id"].ToString());
                     IDdict.Add(msg.payload["id"].ToString(),new idinform());
                     Debug.Log(IDdict.Count);
                     IDdict[msg.payload["id"].ToString()].emotion = getemotion((Dictionary<string, float>)msg.payload["emotion"]);
@@ -75,13 +74,13 @@ public class Chat_Manager : MonoBehaviour
                 else if(msg.from == "tts" && msg.type == "data")
                 {
                     IDdict[msg.payload["id"].ToString()].Text.Add(msg.payload["token"].ToString());
-                    IDdict[msg.payload["id"].ToString()].Voice.Add((float)msg.payload["duration"]);    
-                }
-                else if(msg.from == "tts" && msg.type == "signal" && msg.payload2== "finish")
-                {
-                    Debug.Log("开始输出");
-                    StartCoroutine(Model_talking(IDlist));
-
+                    IDdict[msg.payload["id"].ToString()].Voice.Add((float)msg.payload["duration"]);
+                    IDlist.Enqueue(msg.payload["id"].ToString());
+                    if(!motioncontroller.instance.Is_Talking)
+                    {
+                        Debug.Log("开始输出");
+                        StartCoroutine(Model_talking(IDlist));
+                    }
                 }
             }
             yield return new WaitForSeconds(0.001f);
