@@ -2,7 +2,10 @@ using UnityEngine;
 using System.Text;
 using System.IO;
 using System;
- 
+using System.Linq;
+using System.Runtime.InteropServices;
+using Unity.Mathematics;
+
 /// <summary>
 /// WAV utility for recording and audio playback functions in Unity.
 /// Version: 1.0 alpha 1
@@ -16,18 +19,33 @@ using System;
 /// <remarks>
 /// For documentation and usage examples: https://github.com/deadlyfingers/UnityWav
 /// </remarks>
- 
+
 public class WavUtility
 {
 	// Force save as 16-bit .wav
 	const int BlockSize_16Bit = 2;
- 
+
+	public static AudioClip ToAudioClip(string base64string, string name = "wav")
+	{
+		byte[] bytes = null;
+		try
+        {
+            // 解码 Base64 字符串为字节数组
+            bytes = Convert.FromBase64String(base64string);
+			return ToAudioClip(bytes, name);
+        }
+        catch (FormatException e)
+        {
+            Debug.LogError("Base64 字符串格式不正确: " + e.Message);
+        }
+		return null;
+	}
 	/// <summary>
 	/// Load PCM format *.wav audio file (using Unity's Application data path) and convert to AudioClip.
-	public static AudioClip ToAudioClip (byte[] fileBytes, int offsetSamples = 0, string name = "wav")
+	public static AudioClip ToAudioClip (byte[] fileBytes, string name = "wav")
 	{
-		//string riff = Encoding.ASCII.GetString (fileBytes, 0, 4);
-		//string wave = Encoding.ASCII.GetString (fileBytes, 8, 4);
+		string riff = Encoding.ASCII.GetString (fileBytes, 0, 4);
+		string wave = Encoding.ASCII.GetString (fileBytes, 8, 4);
 		int subchunk1 = BitConverter.ToInt32 (fileBytes, 16);
 		UInt16 audioFormat = BitConverter.ToUInt16 (fileBytes, 20);
  
@@ -37,17 +55,39 @@ public class WavUtility
  
 		UInt16 channels = BitConverter.ToUInt16 (fileBytes, 22);
 		int sampleRate = BitConverter.ToInt32 (fileBytes, 24);
-		//int byteRate = BitConverter.ToInt32 (fileBytes, 28);
-		//UInt16 blockAlign = BitConverter.ToUInt16 (fileBytes, 32);
-		UInt16 bitDepth = BitConverter.ToUInt16 (fileBytes, 34);
- 
-		int headerOffset = 16 + 4 + subchunk1 + 4;
+		int byteRate = BitConverter.ToInt32 (fileBytes, 28);
+		UInt16 blockAlign = BitConverter.ToUInt16 (fileBytes, 32);
+		UInt16 BitsPerSample = BitConverter.ToUInt16 (fileBytes, 34);
+
+		
+		int headerOffset = 0;
+		byte[] targetBytes = System.Text.Encoding.ASCII.GetBytes("data");
+		for (int i = 0; i <= fileBytes.Length - targetBytes.Length; i++)
+		{
+			bool match = true;
+			for (int j = 0; j < targetBytes.Length; j++)
+			{
+				match=true;
+				if (fileBytes[i + j] != targetBytes[j])
+				{	
+					match=false;
+					break;
+				}
+			}
+			if(match)
+				{
+					headerOffset = i+4;
+					break;
+				}
+		}
+
 		int subchunk2 = BitConverter.ToInt32 (fileBytes, headerOffset);
-		//Debug.LogFormat ("riff={0} wave={1} subchunk1={2} format={3} channels={4} sampleRate={5} byteRate={6} blockAlign={7} bitDepth={8} headerOffset={9} subchunk2={10} filesize={11}", riff, wave, subchunk1, formatCode, channels, sampleRate, byteRate, blockAlign, bitDepth, headerOffset, subchunk2, fileBytes.Length);
+		Debug.LogFormat ("riff={0} wave={1} subchunk1={2} format={3} channels={4} sampleRate={5} byteRate={6} blockAlign={7} BitsPerSample={8} headerOffset={9} subchunk2={10} filesize={11}", 
+							riff, wave, subchunk1, formatCode, channels, sampleRate, byteRate, blockAlign, BitsPerSample, headerOffset, subchunk2, fileBytes.Length);
  
 		float[] data;
-        Debug.Log("bitDepth:"+bitDepth);
-		switch (bitDepth) {
+        Debug.Log("bitDepth:"+BitsPerSample);
+		switch (BitsPerSample) {
 		case 8:
 			data = Convert8BitByteArrayToAudioClipData (fileBytes, headerOffset, subchunk2);
 			break;
@@ -61,7 +101,7 @@ public class WavUtility
 			data = Convert32BitByteArrayToAudioClipData (fileBytes, headerOffset, subchunk2);
 			break;
 		default:
-			throw new Exception (bitDepth + " bit depth is not supported.");
+			throw new Exception (BitsPerSample + " bit depth is not supported.");
 		}
  
 		AudioClip audioClip = AudioClip.Create (name, data.Length, (int)channels, sampleRate, false);
