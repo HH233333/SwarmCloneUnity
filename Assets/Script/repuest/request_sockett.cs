@@ -11,14 +11,14 @@ using Tomlyn.Model;
 using System.IO;
 using UnityEngine.UIElements;
 
-public class request_test : MonoBehaviour
+public class request_socket : MonoBehaviour
 {   
     private string[] arg = Environment.GetCommandLineArgs();
     private TcpClient client;
     private NetworkStream stream;
     public request_queue request_Queue;
     public string serverIP = "localhost";  // 服务端 IP 地址
-    public int serverPort = 8006;
+    public int serverPort = 8002;
     private string terminator = "%SEP%";
     private string receivedData;
 
