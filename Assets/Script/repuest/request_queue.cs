@@ -1,16 +1,29 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Collections.Concurrent;
 
+// public class RecvData
+// {
+//     public string from;
+//     public string type;
+//     public Dictionary<string, object> payload= new Dictionary<string, object>();
+//     public string payload2;
+// }
+
+// public class SendData
+// {
+//     public string from;
+//     public string type;
+//     public string payload;
+// }
 public class request_queue : MonoBehaviour
 {
-    private ConcurrentQueue<RecvData> sharequeue = new ConcurrentQueue<RecvData>();
+    private ConcurrentQueue<Dictionary<string, object>> sharequeue = new ConcurrentQueue<Dictionary<string, object>>();
 
-    public RecvData ShareData{
+    public Dictionary<string, object> ShareData{
         get
         {
-            RecvData data;
+            Dictionary<string, object> data;
             sharequeue.TryDequeue(out data);
             return data;
         }
