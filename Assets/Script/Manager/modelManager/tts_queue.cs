@@ -53,10 +53,10 @@ public class tts_queue : MonoBehaviour
         string max_key="";float max_value=0;
         foreach(var item in dict)
         {
-            if((int)item.Value>max_value)
+            if((float)item.Value>max_value)
             {
                 max_key = item.Key;
-                max_value = (int)item.Value;
+                max_value = (float)item.Value;
             }
         }
         return max_key;
