@@ -16,6 +16,7 @@ public class Manager : MonoBehaviour
     private static Manager _instance;
     public static Manager instance => _instance;
     public tts_queue tts_Queue;
+    public danmaku_queue danmaku_Queue;
     public request_queue request_Queue;
     public State state = new State();
 
@@ -58,22 +59,23 @@ public class Manager : MonoBehaviour
                     yield return null; // 每帧检查一次条件
                 }
             }
-            yield return new WaitForSeconds(0.001f);  
+            yield return null;  
         }
 
     }
-
     IEnumerator GetMSG()
     {   
         while(true)
-        {   
-            if(!request_Queue.isempty())
-            {   
+        {
+            if (!request_Queue.isempty())
+            {
                 Dictionary<string, object> msg = request_Queue.ShareData;
-                if((string)msg["source"]=="TTS" || (string)msg["source"]=="LLM")
+                if ((string)msg["source"] == "TTS" || (string)msg["source"] == "LLM")
                     tts_Queue.GetTtsData(msg);
+                if ((string)msg["source"] == "Chat")
+                    danmaku_Queue.GetDanmaku(msg);
             }
-            yield return new WaitForSeconds(0.001f);
+            yield return null;
         }
     }
 

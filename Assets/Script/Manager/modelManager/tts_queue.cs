@@ -4,6 +4,9 @@ using System.Collections.Concurrent;
 using System.Text;
 using UnityEngine.Networking;
 using Newtonsoft.Json.Linq;
+using System.Linq;
+using Unity.IO.LowLevel.Unsafe;
+using Unity.VisualScripting;
 public class ttsdata
 {
     public List<string> Text = new List<string>();
@@ -16,37 +19,47 @@ public class ttsdata
 public class tts_queue : MonoBehaviour
 {
     private Dictionary<string,ttsdata> ttsdatadict = new Dictionary<string,ttsdata>();
-    private ConcurrentQueue<string>IDlist = new ConcurrentQueue<string>();  
+    private ConcurrentQueue<string>FinshIDs = new ConcurrentQueue<string>();  
     private string ID;
+    private string EndID;
+    private List<string> TmpIDList = new List<string>();
     public void GetTtsData(Dictionary<string, object> data)
     {
+        if ((string)data["source"] == "LLM" && (string)data["message_type"] == "Signal")
+            EndID = TmpIDList[TmpIDList.Count - 1];
+
         ID = data.ContainsKey("id") ? data["id"].ToString() : ID;
-        if(ID!=null && !ttsdatadict.ContainsKey(ID))
+
+        if (ID != null && !ttsdatadict.ContainsKey(ID))
         {
-            ttsdatadict.Add(data["id"].ToString(),new ttsdata());
-            Debug.Log("putin");
+            ttsdatadict.Add(data["id"].ToString(), new ttsdata());
+            TmpIDList.Append(ID);
         }
-        if ((string)data["source"] == "LLM" && (string)data["message_type"] != "Signal")
+        else if ((string)data["source"] == "LLM" && (string)data["message_type"] != "Signal")
         {
             ttsdatadict[ID].emotion = getmax((Dictionary<string, object>)data["emotion"]);
         }
-        else if((string)data["source"] == "TTS" && data.ContainsKey("data"))
+        else if ((string)data["source"] == "TTS" && data.ContainsKey("data"))
         {
-            if(data["data"] is string)
+            if (data["data"] is string)
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip(data["data"].ToString());
             else
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip((byte[])data["data"]);
         }
-        else if((string)data["source"] == "TTS" && data.ContainsKey("token"))
-        {   
-            ttsdatadict[ID].Duration.Add((float)data["duration"]); 
-            ttsdatadict[ID].Text.Add(data["token"].ToString());
-        }
-        else if((string)data["source"] == "TTS" && (string)data["message_type"] == "Signal")
+        else if ((string)data["source"] == "TTS" && data.ContainsKey("token"))
         {
-            IDlist.Enqueue(ID);
+            ttsdatadict[ID].Duration.Add((float)data["duration"]);
+            ttsdatadict[ID].Text.Add(data["token"].ToString());
+            if ((string)data["id"] == EndID)
+            {
+                foreach (var item in TmpIDList)
+                {
+                    FinshIDs.Enqueue(item);
+                }
+                TmpIDList.Clear();
+            }
         }
-        Debug.Log(IDlist.Count);
+
     }
     private string getmax(Dictionary<string, object> dict)
     {
@@ -63,7 +76,7 @@ public class tts_queue : MonoBehaviour
     }
     public bool PutTtsData(out ttsdata data)
     {
-        if(IDlist.TryDequeue(out string ID))
+        if(FinshIDs.TryDequeue(out string ID))
         {
             data = ttsdatadict[ID];
             ttsdatadict.Remove(ID);

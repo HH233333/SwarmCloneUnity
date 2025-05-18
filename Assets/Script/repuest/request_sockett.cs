@@ -10,6 +10,7 @@ using Tomlyn;
 using Tomlyn.Model;
 using System.IO;
 using UnityEngine.UIElements;
+using Unity.VisualScripting;
 
 public class request_socket : MonoBehaviour
 {   
@@ -115,6 +116,8 @@ public class request_socket : MonoBehaviour
                 break;
             case JTokenType.Integer:
                 dict.Add(jProperty.Name, (int)jProperty.Value);
+                break;
+            case JTokenType.Array:
                 break;
             case JTokenType.Object:
                 Dictionary<string, object> dict2 = new Dictionary<string, object>();
