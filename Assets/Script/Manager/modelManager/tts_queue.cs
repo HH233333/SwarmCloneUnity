@@ -28,7 +28,7 @@ public class tts_queue : MonoBehaviour
         if ((string)data["source"] == "LLM" && (string)data["message_type"] == "Signal")
             EndID = TmpIDList[TmpIDList.Count - 1];
 
-        ID = data.ContainsKey("id") ? data["id"].ToString() : ID;
+        ID = data.ContainsKey("id") ? data["id"].ToString() : null;
 
         if (ID != null && !ttsdatadict.ContainsKey(ID))
         {
@@ -39,27 +39,27 @@ public class tts_queue : MonoBehaviour
         {
             ttsdatadict[ID].emotion = getmax((Dictionary<string, object>)data["emotion"]);
         }
-        else if ((string)data["source"] == "TTS" && data.ContainsKey("data"))
+        else if ((string)data["source"] == "TTS")
         {
-            if (data["data"] is string)
+            if (data["audio_data"] is string)
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip(data["data"].ToString());
             else
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip((byte[])data["data"]);
-        }
-        else if ((string)data["source"] == "TTS" && data.ContainsKey("token"))
-        {
-            ttsdatadict[ID].Duration.Add((float)data["duration"]);
-            ttsdatadict[ID].Text.Add(data["token"].ToString());
-            if ((string)data["id"] == EndID)
+            foreach (var align_data in (List<Dictionary<string, float>>)data["align_data"])
+            {
+                foreach (KeyValuePair<string, float> pair in align_data)
+                {
+                    ttsdatadict[ID].Text.Add(pair.Key);
+                    ttsdatadict[ID].Duration.Add(pair.Value);
+                }
+            }
+            if (ID == EndID)
             {
                 foreach (var item in TmpIDList)
-                {
                     FinshIDs.Enqueue(item);
-                }
                 TmpIDList.Clear();
             }
         }
-
     }
     private string getmax(Dictionary<string, object> dict)
     {

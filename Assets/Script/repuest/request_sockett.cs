@@ -118,6 +118,9 @@ public class request_socket : MonoBehaviour
                 dict.Add(jProperty.Name, (int)jProperty.Value);
                 break;
             case JTokenType.Array:
+                var list = new List<object>();
+                JArraytolist(list, (JArray)jProperty.Value);
+                dict.Add(jProperty.Name, list);
                 break;
             case JTokenType.Object:
                 Dictionary<string, object> dict2 = new Dictionary<string, object>();
@@ -127,6 +130,35 @@ public class request_socket : MonoBehaviour
                 break;
         }
         return;
+    }
+    void JArraytolist(List<object> list, JArray jArray)
+    {
+        JTokenType cased = jArray[1].Type;
+        switch (cased)
+        {
+            case JTokenType.String:
+                foreach (var token in jArray)
+                    list.Add(token.ToString());
+                break;
+            case JTokenType.Float:
+                foreach (var token in jArray)
+                    list.Add((float)token);
+                break;
+            case JTokenType.Integer:
+                foreach (var token in jArray)
+                    list.Add((int)token);
+                break;
+            case JTokenType.Object:
+                Dictionary<string, object> dict2 = new Dictionary<string, object>();
+                foreach (var token in jArray)
+                {
+                    foreach (var property in token.Values<JProperty>())
+                        JPropertytodict(dict2, property);
+                    list.Add(dict2);
+                    dict2.Clear();
+                }
+                break;
+        }       
     }
     IEnumerator ReceiveData()
     {
