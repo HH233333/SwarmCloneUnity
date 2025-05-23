@@ -13,6 +13,7 @@ public class ttsdata
     public List<float> Duration = new List<float>();
     public string emotion;
     public AudioClip Audio;
+    public bool isend = false;
 }
 
 
@@ -33,40 +34,47 @@ public class tts_queue : MonoBehaviour
         if (ID != null && !ttsdatadict.ContainsKey(ID))
         {
             ttsdatadict.Add(data["id"].ToString(), new ttsdata());
-            TmpIDList.Append(ID);
+            TmpIDList.Add(ID);
         }
-        else if ((string)data["source"] == "LLM" && (string)data["message_type"] != "Signal")
+        if ((string)data["source"] == "LLM" && (string)data["message_type"] != "Signal")
         {
             ttsdatadict[ID].emotion = getmax((Dictionary<string, object>)data["emotion"]);
         }
         else if ((string)data["source"] == "TTS")
         {
-            if (data["audio_data"] is string)
+            if (data["data"] is string)
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip(data["data"].ToString());
             else
                 ttsdatadict[ID].Audio = WavUtility.ToAudioClip((byte[])data["data"]);
-            foreach (var align_data in (List<Dictionary<string, float>>)data["align_data"])
+            List<object> aligndatas = (List<object>)data["align_data"];
+            foreach (var data1 in aligndatas)
             {
-                foreach (KeyValuePair<string, float> pair in align_data)
+                Dictionary<string, object> align_data = new Dictionary<string, object>();
+                align_data = (Dictionary<string, object>)data1;
+                foreach (KeyValuePair<string, object> pair in align_data)
                 {
-                    ttsdatadict[ID].Text.Add(pair.Key);
-                    ttsdatadict[ID].Duration.Add(pair.Value);
+                    if(pair.Key == "token")       
+                        ttsdatadict[ID].Text.Add(pair.Value.ToString());
+                    if(pair.Key == "duration") 
+                        ttsdatadict[ID].Duration.Add((float)pair.Value);
                 }
             }
             if (ID == EndID)
             {
+                ttsdatadict[ID].isend = true;
                 foreach (var item in TmpIDList)
                     FinshIDs.Enqueue(item);
                 TmpIDList.Clear();
             }
         }
+        Debug.Log(TmpIDList.Count);
     }
     private string getmax(Dictionary<string, object> dict)
     {
         string max_key="";float max_value=0;
         foreach(var item in dict)
         {
-            if((float)item.Value>max_value)
+            if ((float)item.Value > max_value)
             {
                 max_key = item.Key;
                 max_value = (float)item.Value;

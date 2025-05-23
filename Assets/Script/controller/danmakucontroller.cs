@@ -27,7 +27,7 @@ public class danmakucontroller : MonoBehaviour
     void DanmakuHandler(DanmakuData data)
     {
         GameObject new_danmaku = Instantiate(p_danmaku);
-        new_danmaku.transform.parent = ui_danmakulist.transform;
+        new_danmaku.transform.SetParent( ui_danmakulist.transform);
         new_danmaku.GetComponent<TMP_Text>().text = data.user + ':' + data.content;
     }
 }
