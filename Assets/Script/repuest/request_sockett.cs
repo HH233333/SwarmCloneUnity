@@ -134,7 +134,7 @@ public class request_socket : MonoBehaviour
     }
     void JArraytolist(List<object> list, JArray jArray)
     {
-        JTokenType cased = jArray[1].Type;
+        JTokenType cased = jArray[0].Type;
         switch (cased)
         {
             case JTokenType.String:

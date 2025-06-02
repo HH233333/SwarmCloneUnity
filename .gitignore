@@ -76,6 +76,7 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 /Assets/Resources.meta
-/Assets/Models/hiyori_pro_zh
-/Assets/ThirdParty/SDK/Live2D
-/Packages
+/Assets/Models/hiyori_pro_zh/
+/Assets/ThirdParty/SDK/Live2D/
+/Packages/
+/Assets/Settings/
