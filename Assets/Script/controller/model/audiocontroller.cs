@@ -56,6 +56,12 @@ public class audiocontroller : MonoBehaviour
         audioSource.Play();
     }
 
+    public void Playsong()
+    {
+        if(audioSource.clip != null)
+            audioSource.Play();
+    }
+
     public void StopAudio()
     {
         // 停止播放音频

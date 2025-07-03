@@ -1,55 +1,60 @@
 using UnityEngine;
-using Live2D.Cubism.Framework.MouthMovement;
 using Live2D.Cubism.Framework;
+using Live2D.Cubism.Framework.Expression;
+using System.Collections.Generic;
+
 
 public class motioncontroller : MonoBehaviour
 {
     public bool HasUpdateController { get; set; }
-
     public bool NeedsUpdateOnEditing
     {
         get { return false; }
     }
-
     public int ExecutionOrder
     {
         get { return 50; }
     }
+    public List<int> emotionduration;
 
-
+    private int framecount = 0;
     private static motioncontroller _instance;
     public static motioncontroller instance => _instance;
-    private CubismMouthController mouthController;
+    private CubismExpressionController expressionController;
     private CubismEyeBlinkController eyesController;
 
-    private Animator anim;
     private string motion;
-    public string Motion{
-        get=>motion;
+    public string Motion
+    {
+        get => motion;
         set
         {
             motion = value;
-            Debug.Log(motion);   
-            if(anim.GetCurrentAnimatorStateInfo(0).IsTag("idel"))
+            Debug.Log(motion);
+            if (expressionController.CurrentExpressionIndex == 0)
             {
-                Manager.instance.state.motioncontroller_IsActivate=true;
-                var random =Random.Range(1,2);
-                switch(motion)
+                Manager.instance.state.motioncontroller_IsActivate = true;
+                switch (motion)
                 {
                     case "like":
-                        anim.SetTrigger("like"+random.ToString());
+                        expressionController.CurrentExpressionIndex = 1;
+                        framecount += emotionduration[0];
                         break;
                     case "disgust":
-                        anim.SetTrigger("disgust");
+                        expressionController.CurrentExpressionIndex = 2;
+                        framecount += emotionduration[1];
                         break;
                     case "anger":
-                        anim.SetTrigger("anger");
+                        expressionController.CurrentExpressionIndex = 3;
+                        framecount += emotionduration[2];
                         break;
                     case "happy":
-                        anim.SetTrigger("happy"+random.ToString());
+                        expressionController.CurrentExpressionIndex = 4;
+                        framecount += emotionduration[3];
                         break;
                     case "sad":
-                        anim.SetTrigger("sad"+random.ToString());
+                        expressionController.CurrentExpressionIndex = 5;
+                        framecount += emotionduration[4];
                         break;
                     case "neutral":
                         break;
@@ -67,20 +72,25 @@ public class motioncontroller : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
     }
     void Start()
     {
-        anim = GetComponent<Animator>();
+        expressionController = GetComponent<CubismExpressionController>();
         eyesController = GetComponent<CubismEyeBlinkController>();
     }
 
     // Update is called once per frame
     public void Update()
     {
-        if(anim.GetCurrentAnimatorStateInfo(0).IsTag("idel"))
-        {   
+        if (framecount > 0)
+            framecount--;
+        else if (expressionController.CurrentExpressionIndex != 0)
+            expressionController.CurrentExpressionIndex = 0;
+            
+        if (expressionController.CurrentExpressionIndex == 0)
+        {
             eyesController.enabled = true;
             Manager.instance.state.motioncontroller_IsActivate = false;
         }

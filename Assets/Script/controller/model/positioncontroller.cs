@@ -32,12 +32,13 @@ public class positioncontroller : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             // 检测射线与物体的碰撞
             int hitCount = raycaster.Raycast(ray,cubismRaycastHits);
+            Debug.Log(hitCount);
             // 如果点击到了要拖拽的物体，则开始拖拽
             if (hitCount > 0)
-                {
-                    isDragging = true;
-                    offset = model.transform.position - Input.mousePosition;
-                }
+            {
+                isDragging = true;
+                offset = model.transform.position - Input.mousePosition;
+            }
         }
         // 检测鼠标左键松开事件
         else if (Input.GetMouseButtonUp(0))

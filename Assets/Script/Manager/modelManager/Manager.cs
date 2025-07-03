@@ -4,11 +4,17 @@ using System.Collections.Concurrent;
 using TMPro;
 using UnityEngine;
 
+public enum modelstatu
+{
+    talking = 1,
+    singing = 2
+}
 public class State
 {
     public bool motioncontroller_IsActivate = false;
     public bool textcontroller_IsActivate = false;
     public bool audiocontroller_IsActivate = false;
+    public modelstatu modelstatu;
 }
 
 public class Manager : MonoBehaviour
@@ -19,7 +25,8 @@ public class Manager : MonoBehaviour
     public request_socket request_Socket;
     public danmaku_queue danmaku_Queue;
     public State state = new State();
-
+    public GameObject audiovisbleupanel;
+    public modelstatu startstatu;
     void Awake()
     {
         if (_instance == null)
@@ -28,42 +35,50 @@ public class Manager : MonoBehaviour
         }
         else
         {
-            Destroy(gameObject); 
+            Destroy(gameObject);
         }
+
+        state.modelstatu = startstatu;
     }
     private void Start()
     {
-        StartCoroutine(Model_talking());
+        
     }
 
 
     private void Update()
     {
-        
-    }
-
-    IEnumerator Model_talking()
-    {   
-        while(true)
+        if (state.modelstatu == modelstatu.talking)
         {
-            if (tts_Queue.PutTtsData(out ttsdata data))
-            {
-                motioncontroller.instance.Motion = data.emotion;
-                StartCoroutine(textcontroller.instance.PutText(data));
-                audiocontroller.instance.PlayAudio(data);
-                while (state.motioncontroller_IsActivate ||
-                       state.textcontroller_IsActivate ||
-                       state.audiocontroller_IsActivate)
-                {
-                    yield return null; // 每帧检查一次条件
-                }
-                if(data.isend)
-                    request_Socket.SendDAudioFinished();
-                
-            }
-            yield return null;  
+            Model_talking();
+            audiovisbleupanel.SetActive(false);
         }
-
+        else if (state.modelstatu == modelstatu.singing)
+        {
+            Model_singing();
+            audiovisbleupanel.SetActive(true);
+        }
     }
 
+    private void Model_talking()
+    {
+        if (state.motioncontroller_IsActivate || state.textcontroller_IsActivate || state.audiocontroller_IsActivate)
+            return;
+        if (tts_Queue.PutTtsData(out ttsdata data))
+        {
+            motioncontroller.instance.Motion = data.emotion;
+            StartCoroutine(textcontroller.instance.PutText(data));
+            audiocontroller.instance.PlayAudio(data);
+            if (data.isend)
+                request_Socket.SendDAudioFinished();
+        }
+    }
+
+    private void Model_singing()
+    {
+        if (state.motioncontroller_IsActivate || state.textcontroller_IsActivate || state.audiocontroller_IsActivate)
+            return;
+        audiocontroller.instance.Playsong();
+        return;   
+    }
 }

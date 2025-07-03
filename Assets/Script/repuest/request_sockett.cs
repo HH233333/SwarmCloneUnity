@@ -178,7 +178,7 @@ public class request_socket : MonoBehaviour
                     {
                         if ((string)data["source"] == "TTS" || (string)data["source"] == "LLM")
                             tts_Queue.GetTtsData(data);
-                        if ((string)data["source"] == "Chat")
+                        if ((string)data["source"] == "Chat" && danmaku_Queue.enabled)
                             danmaku_Queue.GetDanmaku(data);
                     }
                     receivedData = "";
