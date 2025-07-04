@@ -11,7 +11,7 @@ public class danmakucontroller : MonoBehaviour
     public GameObject ui_danmakulist;
     void Start()
     {
-
+        
     }
 
     // Update is called once per frame

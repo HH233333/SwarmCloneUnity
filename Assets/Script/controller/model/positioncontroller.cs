@@ -12,9 +12,23 @@ public class positioncontroller : MonoBehaviour
     private Vector3 offset;// 偏移量    
     private bool isDragging = false; // 是否正在拖拽
 
+    private static positioncontroller _instance;
+    public static positioncontroller instance => _instance;
+
     public float zoomSpeed = 1.0f; // 缩放速度
     public float minScale = 0.1f; // 最小缩放比例
     public float maxScale = 200.0f; // 最大缩放比例
+    void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); 
+        }
+    }
     void Start()
     {
         

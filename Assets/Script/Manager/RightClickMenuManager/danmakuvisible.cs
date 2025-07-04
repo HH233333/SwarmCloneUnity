@@ -7,10 +7,20 @@ public class danmakuvisible : MonoBehaviour
 {
     public danmaku_queue danmaku_Queue;
     public danmakucontroller danmakucontroller;
-    public GameObject danmakupanel; 
+    public GameObject danmakupanel;
+
+    private TMP_Text text;
+
+    void Start()
+    {
+        text = GetComponentInChildren<TMP_Text>();
+        text.text = "不显示弹幕";
+        danmaku_Queue.enabled = false;
+        danmakucontroller.enabled = false;
+        danmakupanel.SetActive(false);
+    }
     public void OnButtonClicked()
     {
-        var text = GetComponentInChildren<TMP_Text>();
         if (text.text == "不显示弹幕")
         {
             text.text = "显示弹幕";

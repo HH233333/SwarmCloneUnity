@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using TMPro;
 using UnityEngine;
+using Live2D.Cubism.Core;
 
 public enum modelstatu
 {

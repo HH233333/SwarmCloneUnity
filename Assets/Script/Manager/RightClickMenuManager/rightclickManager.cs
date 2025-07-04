@@ -7,7 +7,7 @@ public class rightclickManager : MonoBehaviour
 {
     public GameObject rightClickMenu; // 菜单背景 Panel
     public GameObject modelmove;
-    public positioncontroller positioncontroller;
+    
     // Start is called before the first frame update
     void Start()
     {
