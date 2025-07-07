@@ -24,9 +24,13 @@ public class tts_queue : MonoBehaviour
     private string ID;
     private string EndID;
     private List<string> TmpIDList = new List<string>();
+
+    public bool IsEmpty => TmpIDList.Count == 0 && FinshIDs.IsEmpty;
+
     public void GetTtsData(Dictionary<string, object> data)
     {
-        if ((string)data["source"] == "LLM" && (string)data["message_type"] == "Signal")
+        Debug.Log("tts&llm get");
+        if ((string)data["source"] == "LLM" && (string)data["message_type"] == "Signal")    
             EndID = TmpIDList[TmpIDList.Count - 1];
 
         ID = data.ContainsKey("id") ? data["id"].ToString() : null;
@@ -53,9 +57,9 @@ public class tts_queue : MonoBehaviour
                 align_data = (Dictionary<string, object>)data1;
                 foreach (KeyValuePair<string, object> pair in align_data)
                 {
-                    if(pair.Key == "token")       
+                    if (pair.Key == "token")
                         ttsdatadict[ID].Text.Add(pair.Value.ToString());
-                    if(pair.Key == "duration") 
+                    if (pair.Key == "duration")
                         ttsdatadict[ID].Duration.Add((float)pair.Value);
                 }
             }
@@ -67,7 +71,6 @@ public class tts_queue : MonoBehaviour
                 TmpIDList.Clear();
             }
         }
-        Debug.Log(TmpIDList.Count);
     }
     private string getmax(Dictionary<string, object> dict)
     {

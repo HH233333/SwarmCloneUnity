@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Live2D_Model
   layers:
   - Default
   - TransparentFX
@@ -11,7 +12,7 @@ TagManager:
   - Background
   - Water
   - UI
-  - 
+  - model
   - 
   - 
   - 
@@ -42,5 +43,11 @@ TagManager:
     uniqueID: 0
     locked: 0
   - name: Background
-    uniqueID: 318721275
+    uniqueID: 3725489585
+    locked: 0
+  - name: model
+    uniqueID: 835828211
+    locked: 0
+  - name: UI
+    uniqueID: 3432388317
     locked: 0
