@@ -22,9 +22,12 @@ public class Manager : MonoBehaviour
 {
     private static Manager _instance;
     public static Manager instance => _instance;
+
     public tts_queue tts_Queue;
-    public request_socket request_Socket;
+    public sing_queue sing_Queue;
     public danmaku_queue danmaku_Queue;
+    public request_socket request_Socket;
+
     public State state = new State();
     public GameObject audiovisbleupanel;
     public modelstatu startstatu;
@@ -49,7 +52,7 @@ public class Manager : MonoBehaviour
 
     private void Update()
     {
-        if (state.modelstatu == modelstatu.talking)
+        if (state.modelstatu == modelstatu.talking || !tts_Queue.IsEmpty)
         {
             Model_talking();
             audiovisbleupanel.SetActive(false);
@@ -79,7 +82,11 @@ public class Manager : MonoBehaviour
     {
         if (state.motioncontroller_IsActivate || state.textcontroller_IsActivate || state.audiocontroller_IsActivate)
             return;
-        audiocontroller.instance.Playsong();
+        if (sing_Queue.PutSingData(out singdata data))
+        {
+            StartCoroutine(textcontroller.instance.Putsubtitle(data));
+            audiocontroller.instance.PlayAudio(data);
+        }
         return;   
     }
 }

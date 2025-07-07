@@ -11,16 +11,20 @@ using Tomlyn.Model;
 using System.IO;
 using UnityEngine.UIElements;
 using Unity.VisualScripting;
+using UnityEngine.Rendering;
 
 public class request_socket : MonoBehaviour
 {
-    private string[] arg = Environment.GetCommandLineArgs();
     private TcpClient client;
     private NetworkStream stream;
+
     public tts_queue tts_Queue;
     public danmaku_queue danmaku_Queue;
+    public sing_queue sing_Queue;
+
     public string serverIP = "localhost";  // 服务端 IP 地址
     public int serverPort = 8002;
+
     private string terminator = "%SEP%";
     private string receivedData;
 
@@ -93,7 +97,6 @@ public class request_socket : MonoBehaviour
         {
             if (data.Length > 0)
             {
-                Debug.Log(data);
                 Dictionary<string, object> recvdata = new Dictionary<string, object>();
                 JObject jobject = JObject.Parse(data);
                 foreach (var property in jobject.Values<JProperty>())
@@ -176,10 +179,18 @@ public class request_socket : MonoBehaviour
                     List<Dictionary<string, object>> recvdatas = JosnToRecv(receivedData);
                     foreach (var data in recvdatas)
                     {
+                        Debug.Log(data);
                         if ((string)data["source"] == "TTS" || (string)data["source"] == "LLM")
-                            tts_Queue.GetTtsData(data);
+                        {
+                            if (data.ContainsKey("song_id"))
+                                rightclickManager.instance.singmode.OnButtonClicked();
+                            else
+                                tts_Queue.GetTtsData(data);
+                        }
                         if ((string)data["source"] == "Chat" && danmaku_Queue.enabled)
                             danmaku_Queue.GetDanmaku(data);
+                        if ((string)data["source"] == "Plugin")
+                            sing_Queue.GetSingData(data);
                     }
                     receivedData = "";
                 }

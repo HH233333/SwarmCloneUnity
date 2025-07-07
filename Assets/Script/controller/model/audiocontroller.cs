@@ -39,26 +39,32 @@ public class audiocontroller : MonoBehaviour
             Manager.instance.state.audiocontroller_IsActivate = false;
     } 
 
+    public void PlayAudio(singdata data)
+    {
+        PlayAudio(data.songclip);
+    }
     public void PlayAudio(ttsdata data)
     {
-        var audioClip = data.Audio;
-        // 检查音频剪辑是否已设置
-        if (audioClip == null)
+        PlayAudio(data.Audio);
+    }
+
+    private void PlayAudio(AudioClip data)
+    {
+        if (data == null)
         {
             Debug.LogError("AudioClip 为空!");
             return;
         }
 
         // 设置音频剪辑到 AudioSource
-        audioSource.clip = audioClip;
+        audioSource.clip = data;
 
         // 播放音频
         audioSource.Play();
     }
-
     public void Playsong()
     {
-        if(audioSource.clip != null)
+        if (audioSource.clip != null)
             audioSource.Play();
     }
 

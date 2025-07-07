@@ -5,10 +5,25 @@ using UnityEngine.EventSystems;
 
 public class rightclickManager : MonoBehaviour
 {
+    private static rightclickManager _instance;
+    public static rightclickManager instance => _instance;
+
     public GameObject rightClickMenu; // 菜单背景 Panel
-    public GameObject modelmove;
+    public danmakuvisible danmakuvisible;
+    public modelmovebutton modelmovebutton;
+    public singmode singmode;
     
-    // Start is called before the first frame update
+    void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
     void Start()
     {
         rightClickMenu.SetActive(false);
